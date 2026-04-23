@@ -1,70 +1,308 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Un cuestionamiento ante las normas morales y su impacto en la alienación social masiva</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartografía Crítica: Bogotá Nuda Vida</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
     <style>
-        body {
-            background-color: #0f0f0f;
-            color: #e5e5e5;
-            font-family: Georgia, 'Times New Roman', serif;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 900px;
-            margin: 60px auto;
-            background-color: #1a1a1a;
-            padding: 40px 55px;
-            border-radius: 12px;
-            box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
-        }
-        h1 {
-            text-align: center;
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 25px;
-            color: #f2f2f2;
-        }
-        p {
-            text-align: justify;
-            margin-bottom: 20px;
-            font-size: 1.05em;
-            line-height: 1.65;
-        }
-        blockquote {
-            font-style: italic;
-            background-color: #111;
-            padding: 18px 22px;
-            border-left: 3px solid #555;
-            border-radius: 8px;
-            margin: 30px 45px;
-            color: #d0d0d0;
-        }
-        footer {
-            text-align: center;
-            font-size: 0.85em;
-            margin-top: 45px;
-            color: #777;
-        }
+      :root {
+        --sovereign-red: #8b0000;
+        --refugee-orange: #d84315;
+        --exclusion-blue: #0d47a1;
+        --limbo-gray: #455a64;
+        --dark-bg: #1a1a1b;
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Inter", sans-serif;
+        background: var(--dark-bg);
+        color: #e0e0e0;
+      }
+
+      .wrapper {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      #map {
+        flex: 1;
+        background: #000;
+      }
+
+      #sidebar {
+        width: 420px;
+        background: #121212;
+        border-left: 1px solid #333;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        padding: 35px;
+        overflow-y: auto;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+      }
+
+      header h1 {
+        font-size: 22px;
+        color: #fff;
+        border-bottom: 2px solid var(--sovereign-red);
+        padding-bottom: 15px;
+        letter-spacing: 1px;
+      }
+      header p {
+        font-size: 14px;
+        color: #aaa;
+        margin-top: 15px;
+        line-height: 1.5;
+      }
+
+      .filter-group {
+        margin: 25px 0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .filter-btn {
+        padding: 8px 14px;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        border: 1px solid #444;
+        background: #1a1a1a;
+        color: #ccc;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .filter-btn:hover {
+        border-color: var(--sovereign-red);
+        color: white;
+      }
+      .filter-btn.active {
+        background: var(--sovereign-red);
+        color: white;
+        border-color: var(--sovereign-red);
+      }
+
+      #content-area {
+        margin-top: 25px;
+      }
+      .quote {
+        font-style: italic;
+        color: #999;
+        border-left: 4px solid var(--sovereign-red);
+        padding-left: 20px;
+        margin-top: 25px;
+        font-size: 14px;
+        line-height: 1.6;
+        background: #1a1a1a;
+        padding: 15px;
+      }
+      .tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 2px;
+        color: white;
+        font-size: 10px;
+        font-weight: 800;
+        margin-bottom: 15px;
+      }
+
+      /* Estilo para los popups del mapa */
+      .leaflet-popup-content-wrapper {
+        background: #1a1a1a;
+        color: white;
+        border-radius: 4px;
+      }
+      .leaflet-popup-tip {
+        background: #1a1a1a;
+      }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Un cuestionamiento ante las normas morales y su impacto en la alienación social masiva</h1>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div id="map"></div>
 
-        <p>El presente escrito tiene como fin promulgar un saber o una conciencia que guíe al pensamiento. No pretendo crear un escenario distópico o idílico que permita el descontrol, sino esclarecer una problemática que está unificando y estandarizando el mundo —hecho que no suena tan mal; sin embargo, esto trae consigo varias “pandemias” que decuplican la angustia y el absurdo en los comunes. Me refiero al rumbo que toman las normas morales en la sociedad actual y a cómo todo esto se traduce en una especie de actuación masiva, en la cual cada individuo asume un papel o guion que cumple sin previo aviso, desde que nace hasta que muere, siguiendo normas que preceden a su propia existencia.</p>
+      <aside id="sidebar">
+        <header>
+          <h1>CARTOGRAFÍA DE LA EXCLUSIÓN</h1>
+          <p>
+            Bogotá como laboratorio biopolítico: donde la ley se suspende para
+            gestionar la vida como mera biología.
+          </p>
+        </header>
 
-        <p>La mayoría de contextos sociales —por no decir la totalidad— se rigen bajo una serie de interacciones que permiten su libre desarrollo. Sin embargo, llega un punto en donde estas interacciones se vuelven vacías debido a un hecho muy acomplejante: los preceptos morales. Esto no es inherentemente malo; no obstante, la acotación abusiva y presuntuosa de esto deriva en aspectos como un mundo lleno de superficialidades o en la estigmatización forzada. Lo anterior puede verse reflejado en la siguiente cita:</p>
+        <div class="filter-group">
+          <button
+            class="filter-btn active"
+            onclick="filterMarkers('all', this)"
+          >
+            Todas las zonas
+          </button>
+          <button class="filter-btn" onclick="filterMarkers('excepcion', this)">
+            Estado de Excepción
+          </button>
+          <button class="filter-btn" onclick="filterMarkers('nuda-vida', this)">
+            Nuda Vida
+          </button>
+          <button class="filter-btn" onclick="filterMarkers('limbo', this)">
+            Limbo Jurídico
+          </button>
+        </div>
 
-        <blockquote>“La sociedad moderna ha sustituido el látigo externo por un látigo interior: la necesidad de ajustarse a las expectativas sociales. El resultado es una uniformidad de pensamiento y conducta donde el individuo cree elegir libremente aquello que en realidad le ha sido impuesto.”<br><br>— Erich Fromm, <i>El miedo a la libertad</i> (1941)</blockquote>
-
-        <p>Ahora bien, dicha moralización excesiva no solo condiciona la conducta, sino que también limita la capacidad de reflexión individual. La costumbre de calificar todo acto bajo la etiqueta de “correcto” o “incorrecto” genera un pensamiento binario que sofoca la autenticidad y el cuestionamiento personal. Aquello que no encaja en el molde estándar es desechado, cancelado o ridiculizado, lo que alimenta un miedo colectivo a diferir. Se configura así una sociedad donde ser uno mismo se vuelve un riesgo, y donde las personas prefieren imitar antes que pensar, replicar antes que sentir, y obedecer antes que comprender. La alienación se intensifica cuando el individuo deja de reconocerse como autor de sus propias decisiones y se convierte en un producto de normas heredadas y jamás examinadas.</p>
-
-        <p>En conclusión, las normas morales, lejos de garantizar únicamente convivencia y orden, han adquirido un carácter regulador de la identidad y de la libertad interior. La estandarización del comportamiento humano ha llevado a una pérdida gradual de autenticidad, fomentando una sociedad que actúa más por inercia que por convicción, más por miedo al juicio que por búsqueda de sentido. Cuestionar dichas normas no implica caer en el caos, sino recuperar la facultad de decidir quiénes somos sin el guion impuesto por otros. Solo a través del pensamiento crítico podremos transformar la moral en un instrumento de libertad, y no de alienación.</p>
-
-        <footer>Archivo generado</footer>
+        <div id="content-area">
+          <p
+            style="
+              color: #666;
+              text-align: center;
+              padding-top: 100px;
+              font-size: 14px;
+            "
+          >
+            ← Selecciona un umbral en el mapa para iniciar el análisis.
+          </p>
+        </div>
+      </aside>
     </div>
-</body>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      // Mapa con estilo oscuro (CartoDB Dark Matter)
+      const map = L.map("map", { zoomControl: false }).setView(
+        [4.615, -74.085],
+        13,
+      );
+      L.control.zoom({ position: "bottomleft" }).addTo(map);
+
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        {
+          attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+        },
+      ).addTo(map);
+
+      const ZONAS = [
+        {
+          name: "Antiguo Bronx (La L)",
+          coords: [4.6033, -74.0805],
+          cat: "excepcion",
+          color: "#8b0000",
+          concept: "El Campo Urbano",
+          desc: "Históricamente, El Bronx funcionó como un 'agujero negro' jurídico en el corazón de la capital. Fue el espacio donde el Estado decidió no entrar, permitiendo que la ley se suspendiera para que el crimen organizado ejerciera una soberanía paralela. Tras la intervención de 2016, los habitantes se dispersaron, evidenciando que el 'campo' no es un lugar, sino una condición que el Estado puede activar o desactivar.",
+          quote:
+            "«El campo es el lugar en el cual el estado de excepción, que era una suspensión temporal de la ley, adquiere una disposición espacial permanente». — Agamben",
+        },
+        {
+          name: "Cárcel La Modelo (Patios Internos)",
+          coords: [4.6291, -74.113],
+          cat: "excepcion",
+          color: "#8b0000",
+          concept: "El Cuerpo Insacrificable",
+          desc: "La masacre de 2020 puso de presente que el interno es el Homo Sacer moderno: una vida que puede ser suprimida en nombre de la 'seguridad' o el 'orden' sin que su muerte sea tratada como un asesinato político. El hacinamiento extremo despoja al individuo de su 'Bios' (vida política) para dejarlo solo con su 'Zoe' (vida biológica) a merced de la soberanía carcelaria.",
+          quote:
+            "«La vida capturada en el bando es nuda vida: vida que se puede matar sin cometer homicidio».",
+        },
+        {
+          name: "Hospital San Juan de Dios",
+          coords: [4.5916, -74.0886],
+          cat: "limbo",
+          color: "#455a64",
+          concept: "Suspensión de la Ciudadanía",
+          desc: "Este hospital representa un limbo jurídico y administrativo. Trabajadores que pasaron años viviendo en sus instalaciones sin salario ni protección legal, y pacientes atrapados en la desidia institucional. Es un espacio donde la ley existe formalmente pero no se aplica, creando una zona de indistinción entre lo público y lo privado, lo vivo y lo muerto.",
+          quote:
+            "«La estructura del bando es la estructura de la ley que se aplica en su misma desaplicación».",
+        },
+        {
+          name: "Canal del Río Fucha (Habitabilidad de Calle)",
+          coords: [4.585, -74.11],
+          cat: "nuda-vida",
+          color: "#d84315",
+          concept: "Homo Sacer Urbano",
+          desc: "Los caños y canales de Bogotá son las arterias de la nuda vida. Aquí, el habitante de calle es reducido a su función biológica básica. Las 'limpiezas sociales' recurrentes son actos soberanos de exclusión donde estas vidas son marcadas como 'no valiosas', existiendo fuera del contrato social pero bajo la vigilancia punitiva del Estado.",
+          quote:
+            "«La biopolítica moderna nace en el momento en que la nuda vida entra en la esfera de la polis».",
+        },
+        {
+          name: "Altos de Cazucá / Ciudad Bolívar",
+          coords: [4.575, -74.175],
+          cat: "nuda-vida",
+          color: "#d84315",
+          concept: "El Bando y el Refugiado",
+          desc: "Zona de recepción masiva de víctimas del desplazamiento forzado. El desplazado es la figura máxima de la nuda vida: ha perdido sus derechos, su tierra y su estatus político. En las laderas de Soacha y Ciudad Bolívar, la vida se gestiona como una emergencia perpetua, donde la ayuda humanitaria reemplaza a la justicia ciudadana.",
+          quote:
+            "«El refugiado es el único concepto que nos permite vislumbrar una nueva comunidad política fuera de la soberanía del Estado-nación».",
+        },
+        {
+          name: "UPJ (Unidad Permanente de Justicia)",
+          coords: [4.622, -74.095],
+          cat: "excepcion",
+          color: "#8b0000",
+          concept: "Detención Soberana",
+          desc: "Espacios de retención temporal donde el ciudadano es privado de su libertad 'por protección' o 'control', a menudo sin cargos formales. Representa el micro-estado de excepción cotidiano, donde la policía decide quién es una amenaza para el orden público, suspendiendo el debido proceso por 24 horas.",
+          quote:
+            "«La soberanía se manifiesta en la capacidad de decidir sobre lo que es normal y lo que es excepcional».",
+        },
+      ];
+
+      let markerLayer = L.layerGroup().addTo(map);
+
+      function renderMarkers(category = "all") {
+        markerLayer.clearLayers();
+        ZONAS.forEach((z) => {
+          if (category === "all" || z.cat === category) {
+            const marker = L.circleMarker(z.coords, {
+              radius: 12,
+              fillColor: z.color,
+              color: "#fff",
+              weight: 1,
+              fillOpacity: 0.7,
+            });
+
+            marker.bindTooltip(z.name, {
+              direction: "top",
+              className: "marker-tooltip",
+            });
+            marker.on("click", () => {
+              updateSidebar(z);
+              map.flyTo(z.coords, 15);
+            });
+            marker.addTo(markerLayer);
+          }
+        });
+      }
+
+      function updateSidebar(z) {
+        const area = document.getElementById("content-area");
+        area.innerHTML = `
+            <span class="tag" style="background:${z.color}">${z.concept.toUpperCase()}</span>
+            <h2 style="margin:0 0 10px 0; color:#fff;">${z.name}</h2>
+            <p style="font-size:12px; color:var(--sovereign-red); font-weight:bold; margin-bottom:20px;">CATEGORÍA: ${z.cat.toUpperCase()}</p>
+            <p style="line-height:1.7; color:#ccc; text-align:justify; font-size:15px;">${z.desc}</p>
+            <div class="quote">${z.quote}</div>
+            <p style="margin-top:30px; font-size:10px; color:#444; letter-spacing:1px;">DATA_ID: BOG_${z.cat}_${z.name.substring(0, 3).toUpperCase()}</p>
+        `;
+      }
+
+      function filterMarkers(cat, btn) {
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderMarkers(cat);
+      }
+
+      renderMarkers();
+    </script>
+  </body>
 </html>
